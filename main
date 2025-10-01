@@ -1,0 +1,20 @@
+#!/bin/bash
+
+#SBATCH --job-name=template
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=1G
+#SBATCH --time=00:15:00
+# 
+# Author: Vasilis Karlaftis
+
+input=`jq -r '.input' config.json`
+ref=`jq -r '.ref' config.json`
+
+# make output directory
+mkdir -p out_dir
+
+# run the actual python code
+singularity exec docker://brainlife/fsl:6.0.4-patched2 flirt -in ${input} -ref ${ref} -out out_dir/dwi.nii.gz -cost 'leastsq'
+
+cp dwi.bvecs out_dir/dwi.bvecs
+cp dwi.bvals out_dir/dwi.bvals
